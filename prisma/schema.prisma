@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model CropReception {
+  id             Int      @id @default(autoincrement())
+  operation_date DateTime
+  factory_id     Int
+  field_grade_id Int
+  supply_unit_id Int
+  qty_crop       Float
+  user_id        String
+
+  fieldSupply FieldSupply    @relation(fields: [field_grade_id], references: [id])
+  supplyUnit  CropSupplyUnit @relation(fields: [supply_unit_id], references: [id])
+  factory     Factory        @relation(fields: [factory_id], references: [id])
+}
+
+model CropProcessing {
+  id               Int      @id @default(autoincrement())
+  operation_date   DateTime
+  factory_id       Int
+  process_grade_id Int
+  qty_proc         Float
+  user_id          String
+
+  //relationship
+  factory Factory     @relation(fields: [factory_id], references: [id])
+  grade   FieldSupply @relation(fields: [process_grade_id], references: [id])
+}
+
+model Factory {
+  id           Int    @id @default(autoincrement())
+  factory_name String
+
+  cropProcessing CropProcessing[]
+  cropReception  CropReception[]
+}
+
+model CropType {
+  id        Int    @id @default(autoincrement())
+  crop_type String
+}
+
+//this is like the various estates supplying the factories.
+model CropSupplyUnit {
+  id          Int @id @default(autoincrement())
+  estate_id   Int
+  sub_unit_id Int
+
+  subUnit       SubUnit         @relation(fields: [sub_unit_id], references: [id]) //one to many relation with subUnit.
+  cropReception CropReception[]
+}
+
+model Estate {
+  id            Int    @id @default(autoincrement())
+  name          String
+  agric_unit_id Int
+
+  agricUnit AgricUnit @relation(fields: [agric_unit_id], references: [id])
+}
+
+model AgricUnit {
+  id         Int    @id @default(autoincrement())
+  agric_unit String
+
+  estate Estate[]
+}
+
+model SubUnit {
+  id             Int              @id @default(autoincrement())
+  sub_unit       String
+  grp            Int
+  cropSupplyUnit CropSupplyUnit[]
+}
+
+model FieldSupply {
+  id               Int    @id @default(autoincrement())
+  crop             String
+  productnature_id Int //foreing key.
+
+  //attribute to product
+  productNature  ProductNature    @relation(fields: [productnature_id], references: [id])
+  cropProcessing CropProcessing[]
+  cropReception  CropReception[]
+}
+
+model ProductNature {
+  id      Int    @id @default(autoincrement()) //primary key
+  product String
+
+  fieldSupplies FieldSupply[]
+}
