@@ -10,18 +10,18 @@ import {
 const router = express.Router();
 
 // Get all crop processings
-router.get("/", getAllProcessing);
+router.get("/", requireAuth, getAllProcessing);
 
 // Get a single crop processing by ID
-router.get("/:id", getProcessingById);
+router.get("/:id", requireAuth, getProcessingById);
 
 // Create a new crop processing
-router.post("/", createProcessing);
+router.post("/", requireAuth, createProcessing);
 
 // Update a crop processing
-router.put("/:id", updateProcessing);
+router.put("/:id", requireAuth, updateProcessing);
 
 // Delete a crop processing
-router.delete("/:id", deleteProcessing);
+router.delete("/:id", requireAuth, deleteProcessing);
 
 export default router;
