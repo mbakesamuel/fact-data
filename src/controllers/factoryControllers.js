@@ -1,19 +1,19 @@
 import { sql } from "../config/db.js";
 
 //get all receptions
-export const getAllReception = async (req, res) => {
+export const getAllFactory = async (req, res) => {
   try {
-    const rows = await sql`SELECT * FROM "CropReception"`;
+    const rows = await sql`SELECT * FROM "Factory"`;
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-export const getReceptionById = async (req, res) => {
+export const getFactoryById = async (req, res) => {
   const { id } = req.params;
   try {
-    const [row] = await sql`SELECT * FROM "CropReception" WHERE id = ${id}`;
+    const [row] = await sql`SELECT * FROM "Factory" WHERE id = ${id}`;
     if (!row) return res.status(404).json({ error: "Not found" });
     res.json(row);
   } catch (error) {
@@ -21,28 +21,27 @@ export const getReceptionById = async (req, res) => {
   }
 };
 
-export const createReception = async (req, res) => {
+/* export const createReception = async (req, res) => {
   const {
     operation_date,
     factory_id,
     field_grade_id,
     supply_unit_id,
     qty_crop,
-    user_id,
   } = req.body;
   try {
     const [row] = await sql`
-  INSERT INTO "CropReception" (operation_date, factory_id, field_grade_id, supply_unit_id, qty_crop, user_id)
-  VALUES (${operation_date}, ${factory_id}, ${field_grade_id}, ${supply_unit_id}, ${qty_crop}, ${user_id})
+  INSERT INTO "CropReception" (operation_date, factory_id, field_grade_id, supply_unit_id, qty_crop)
+  VALUES (${operation_date}, ${factory_id}, ${field_grade_id}, ${supply_unit_id}, ${qty_crop})
   RETURNING *
 `;
     res.status(201).json(row);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-};
+}; */
 
-export const updateReception = async (req, res) => {
+/* export const updateReception = async (req, res) => {
   const { id } = req.params;
   const {
     operation_date,
@@ -67,9 +66,9 @@ export const updateReception = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-};
+}; */
 
-export const deleteReception = async (req, res) => {
+/* export const deleteReception = async (req, res) => {
   const { id } = req.params;
   try {
     const [row] =
@@ -79,4 +78,4 @@ export const deleteReception = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-};
+}; */

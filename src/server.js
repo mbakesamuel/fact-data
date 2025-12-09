@@ -4,7 +4,7 @@ import { initDB } from "./config/db.js";
 import dotenv from "dotenv";
 import cropProcessingRoutes from "./routes/cropProcessingRoutes.js";
 import cropReceptionRoutes from "./routes/cropReceptionRoutes.js";
-import job from "./config/cron.js";
+import factoryRoutes from "./routes/factoryRoutes.js";
 
 //load environment variables from .env file
 dotenv.config();
@@ -13,11 +13,6 @@ dotenv.config();
 const app = express();
 
 app.use(cors());
-
-if (process.env.NODE_ENV === "production") {
-  //start the cron job only in production environment
-  job.start();
-}
 
 //init some middlewares
 
@@ -30,6 +25,7 @@ app.get("/api/health", async (req, res) => {
 
 app.use("/api/crop-receptions", cropReceptionRoutes);
 app.use("/api/crop-processings", cropProcessingRoutes);
+app.use("/api/factory", factoryRoutes);
 
 initDB().then(() => {
   app.listen(process.env.PORT, () => {
