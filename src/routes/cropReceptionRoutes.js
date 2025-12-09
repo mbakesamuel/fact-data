@@ -6,6 +6,7 @@ import {
   getReceptionById,
   updateReception,
 } from "../controllers/receptionControllers.js";
+import { requireAuth } from "../middleware/auth.js";
 
 const router = express.Router();
 
