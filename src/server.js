@@ -1,4 +1,4 @@
-import express from "express";
+/* import express from "express";
 import cors from "cors";
 import { initDB } from "./config/db.js";
 import dotenv from "dotenv";
@@ -41,5 +41,58 @@ app.use("/api/factory", factoryRoutes);
 initDB().then(() => {
   app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${process.env.PORT}`);
+  });
+});
+ */
+
+import express from "express";
+import cors from "cors";
+import { initDB } from "./config/db.js";
+import dotenv from "dotenv";
+import cropProcessingRoutes from "./routes/cropProcessingRoutes.js";
+import cropReceptionRoutes from "./routes/cropReceptionRoutes.js";
+import factoryRoutes from "./routes/factoryRoutes.js";
+
+// Load environment variables from .env file
+dotenv.config();
+
+// Initialize the app
+const app = express();
+
+// Decide allowed origins based on environment
+const allowedOrigins =
+  process.env.NODE_ENV === "production"
+    ? ["https://your-frontend.com"] // ✅ only your deployed frontend
+    : ["http://localhost:8081"]; // ✅ Expo web dev server
+
+// ✅ Apply CORS middleware before routes
+app.use(
+  cors({
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+// ✅ Explicitly handle preflight requests
+app.options("*", cors());
+
+app.use(express.json());
+
+// Health check route
+app.get("/api/health", async (req, res) => {
+  res.status(200).json({ message: "all systems ok" });
+});
+
+// API routes
+app.use("/api/crop-receptions", cropReceptionRoutes);
+app.use("/api/crop-processings", cropProcessingRoutes);
+app.use("/api/factory", factoryRoutes);
+
+// Initialize DB and start server
+initDB().then(() => {
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
   });
 });
