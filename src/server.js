@@ -12,7 +12,14 @@ dotenv.config();
 //initialize the app and prisma.
 const app = express();
 
-app.use(cors());
+//app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:8081", // allow your Expo web app
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 //init some middlewares
 
