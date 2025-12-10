@@ -8,7 +8,8 @@ import { requireAuth } from "../middleware/auth.js";
 const router = express.Router();
 
 // Get all crop receptions
-router.get("/", requireAuth, getAllFactory);
+//router.get("/", requireAuth, getAllFactory);
+router.get("/", getAllFactory);
 
 // Get a single crop reception by ID
 router.get("/:id", requireAuth, getFactoryById);
