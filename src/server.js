@@ -27,9 +27,6 @@ app.use(
   })
 );
 
-// Optional: handle preflight requests explicitly
-app.options("*", cors());
-
 app.use(express.json());
 
 //for health checks, define a health url
