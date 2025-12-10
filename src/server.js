@@ -21,7 +21,8 @@ app.use(
   })
 );
 
-//init some middlewares
+// Optional: handle preflight requests explicitly
+app.options("*", cors());
 
 app.use(express.json());
 
