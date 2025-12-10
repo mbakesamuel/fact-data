@@ -45,27 +45,34 @@ initDB().then(() => {
 });
  */
 
+// server.js
 import express from "express";
 import cors from "cors";
-import { initDB } from "./config/db.js";
 import dotenv from "dotenv";
+import { initDB } from "./config/db.js";
+
+// Import route modules
 import cropProcessingRoutes from "./routes/cropProcessingRoutes.js";
 import cropReceptionRoutes from "./routes/cropReceptionRoutes.js";
 import factoryRoutes from "./routes/factoryRoutes.js";
 
-// Load environment variables from .env file
+// Load environment variables
 dotenv.config();
 
-// Initialize the app
+// Initialize Express app
 const app = express();
 
-// Decide allowed origins based on environment
+// Allowed origins for CORS
 const allowedOrigins =
   process.env.NODE_ENV === "production"
-    ? ["https://your-frontend.com"] // ✅ only your deployed frontend
-    : ["http://localhost:8081"]; // ✅ Expo web dev server
+    ? ["https://your-frontend.com"] // ✅ replace with your deployed frontend domain
+    : [
+        "http://localhost:8081", // Expo web dev server
+        "http://localhost:19006", // Expo Metro bundler default
+        "http://127.0.0.1:8081", // alternative localhost
+      ];
 
-// ✅ Apply CORS middleware before routes
+// Apply CORS middleware
 app.use(
   cors({
     origin: allowedOrigins,
@@ -74,22 +81,31 @@ app.use(
   })
 );
 
+// Parse JSON request bodies
 app.use(express.json());
 
 // Health check route
-app.get("/api/health", async (req, res) => {
+app.get("/api/health", (req, res) => {
   res.status(200).json({ message: "all systems ok" });
 });
 
 // API routes
+app.use("/api/factory", factoryRoutes);
 app.use("/api/crop-receptions", cropReceptionRoutes);
 app.use("/api/crop-processings", cropProcessingRoutes);
-app.use("/api/factory", factoryRoutes);
+
+// Global error handler (optional, but recommended)
+app.use((err, req, res, next) => {
+  console.error("❌ Backend error:", err);
+  res.status(err.status || 500).json({
+    error: err.message || "Internal Server Error",
+  });
+});
 
 // Initialize DB and start server
 initDB().then(() => {
   const port = process.env.PORT || 3000;
   app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+    console.log(`✅ Server is running on port ${port}`);
   });
 });
