@@ -12,6 +12,12 @@ dotenv.config();
 //initialize the app and prisma.
 const app = express();
 
+// Decide allowed origins based on environment
+const allowedOrigins =
+  process.env.NODE_ENV === "production"
+    ? ["https://your-frontend.com"] // ✅ only your deployed frontend
+    : ["*"]; // ✅ allow every
+
 //app.use(cors());
 app.use(
   cors({
