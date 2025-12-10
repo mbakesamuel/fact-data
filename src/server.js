@@ -10,34 +10,7 @@ import factoryRoutes from "./routes/factoryRoutes.js";
 dotenv.config();
 const app = express();
 
-// Allowed origins
-const allowedOrigins =
-  process.env.NODE_ENV === "production"
-    ? ["https://your-frontend.com"] // replace with your deployed frontend
-    : [
-        "http://localhost:8081", // Expo web dev
-        "http://localhost:19006", // Metro bundler
-        "http://127.0.0.1:8081", // alternative localhost
-      ];
-
-// Apply CORS once with custom config
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // allow requests with no origin (like mobile apps, curl)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      const err = new Error("Not allowed by CORS");
-      err.status = 403;
-      return callback(err);
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
+app.use(cors());
 
 // Parse JSON
 app.use(express.json());
