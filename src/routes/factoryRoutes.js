@@ -9,10 +9,10 @@ const router = express.Router();
 
 // Get all crop receptions
 //router.get("/", requireAuth, getAllFactory);
-router.get("/", requireAuth, getAllFactory);
+router.get("/", getAllFactory);
 
 // Get a single crop reception by ID
-router.get("/:id", requireAuth, getFactoryById);
+router.get("/:id", getFactoryById);
 
 /* // Create a new crop reception
 router.post("/", createReception);
