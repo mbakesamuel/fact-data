@@ -11,18 +11,18 @@ import { requireAuth } from "../middleware/auth.js";
 const router = express.Router();
 
 // Get all crop receptions
-router.get("/", requireAuth, getAllReception);
+router.get("/", getAllReception);
 
 // Get a single crop reception by ID
-router.get("/:id", requireAuth, getReceptionById);
+router.get("/:id", getReceptionById);
 
 // Create a new crop reception
-router.post("/", requireAuth, createReception);
+router.post("/", createReception);
 
 // Update a crop reception
-router.put("/:id", requireAuth, updateReception);
+router.put("/:id", updateReception);
 
 // Delete a crop reception
-router.delete("/:id", requireAuth, deleteReception);
+router.delete("/:id", deleteReception);
 
 export default router;
