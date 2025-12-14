@@ -8,6 +8,7 @@ import cropReceptionRoutes from "./routes/cropReceptionRoutes.js";
 import factoryRoutes from "./routes/factoryRoutes.js";
 import fieldSupplyRoutes from "./routes/fieldSupplyRoutes.js";
 import cropSupplyUnitRoutes from "./routes/cropSupplyUnitRoutes.js";
+import factoryGradeRoutes from "./routes/factoryGradeRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -25,6 +26,7 @@ app.get("/api/health", (req, res) => {
 // Routes
 app.use("/api/factory", factoryRoutes);
 app.use("/api/field-supplies", fieldSupplyRoutes);
+app.use("/api/factory-grades", factoryGradeRoutes);
 app.use("/api/crop-supply-units", cropSupplyUnitRoutes);
 app.use("/api/crop-receptions", cropReceptionRoutes);
 app.use("/api/crop-processings", cropProcessingRoutes);
