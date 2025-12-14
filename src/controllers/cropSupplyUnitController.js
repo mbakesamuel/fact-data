@@ -6,7 +6,8 @@ export const getAllCropSupplyUnit = async (req, res) => {
     const rows = await sql`
       SELECT 
         "CropSupplyUnit".id AS crop_supply_unit_id,
-        "Estate".name AS estate
+        "SubUnit".sub_unit AS sub_unit
+        "Estate".name AS estate ,        
       FROM "CropSupplyUnit"
       INNER JOIN "Estate"
         ON "CropSupplyUnit".estate_id = "Estate".id;
