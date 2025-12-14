@@ -6,11 +6,13 @@ export const getAllCropSupplyUnit = async (req, res) => {
     const rows = await sql`
       SELECT 
         "CropSupplyUnit".id AS crop_supply_unit_id,
-        "SubUnit".sub_unit AS sub_unit
-        "Estate".name AS estate ,        
+        "SubUnit".sub_unit AS sub_unit,
+        "Estate".name AS estate      
       FROM "CropSupplyUnit"
       INNER JOIN "Estate"
-        ON "CropSupplyUnit".estate_id = "Estate".id;
+        ON "CropSupplyUnit".estate_id = "Estate".id
+      INNER JOIN "SubUnit"
+        ON "CropSupplyUnit".sub_unit_id = "SubUnit".id;
     `;
     res.json(rows);
   } catch (error) {
