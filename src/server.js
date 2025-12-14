@@ -6,6 +6,7 @@ import { initDB } from "./config/db.js";
 import cropProcessingRoutes from "./routes/cropProcessingRoutes.js";
 import cropReceptionRoutes from "./routes/cropReceptionRoutes.js";
 import factoryRoutes from "./routes/factoryRoutes.js";
+import fieldSupplyRoutes from "./routes/factoryRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -22,6 +23,7 @@ app.get("/api/health", (req, res) => {
 
 // Routes
 app.use("/api/factory", factoryRoutes);
+app.use("/api/field-supplies", fieldSupplyRoutes);
 app.use("/api/crop-receptions", cropReceptionRoutes);
 app.use("/api/crop-processings", cropProcessingRoutes);
 
