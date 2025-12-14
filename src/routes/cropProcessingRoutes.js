@@ -11,18 +11,18 @@ import { requireAuth } from "../middleware/auth.js";
 const router = express.Router();
 
 // Get all crop processings
-router.get("/", requireAuth, getAllProcessing);
+router.get("/", getAllProcessing);
 
 // Get a single crop processing by ID
-router.get("/:id", requireAuth, getProcessingById);
+router.get("/:id", getProcessingById);
 
 // Create a new crop processing
-router.post("/", requireAuth, createProcessing);
+router.post("/", createProcessing);
 
 // Update a crop processing
-router.put("/:id", requireAuth, updateProcessing);
+router.put("/:id", updateProcessing);
 
 // Delete a crop processing
-router.delete("/:id", requireAuth, deleteProcessing);
+router.delete("/:id", deleteProcessing);
 
 export default router;
