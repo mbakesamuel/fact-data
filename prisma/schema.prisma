@@ -60,6 +60,7 @@ model CropSupplyUnit {
   sub_unit_id Int
 
   subUnit       SubUnit         @relation(fields: [sub_unit_id], references: [id]) //one to many relation with subUnit.
+  estate        Estate          @relation(fields: [estate_id], references: [id])
   cropReception CropReception[]
 }
 
@@ -68,7 +69,8 @@ model Estate {
   name          String
   agric_unit_id Int
 
-  agricUnit AgricUnit @relation(fields: [agric_unit_id], references: [id])
+  agricUnit       AgricUnit        @relation(fields: [agric_unit_id], references: [id])
+  cropSupplyUnits CropSupplyUnit[]
 }
 
 model AgricUnit {

@@ -1,10 +1,30 @@
 import { sql } from "../config/db.js";
 
 //get all receptions
-export const getAllCropSupplyUnit = async (req, res) => {
+/* export const getAllCropSupplyUnit = async (req, res) => {
   try {
     const rows = await sql`
       SELECT * FROM "CropSupplyUnit";
+    `;
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}; */
+
+export const getAllCropSupplyUnit = async (req, res) => {
+  try {
+    const rows = await sql`
+      SELECT 
+        "CropSupplyUnit".id AS crop_supply_unit_id,
+        "Estate".name AS estate,
+        "SubUnit".id AS sub_unit_id,
+        "SubUnit".sub_unit AS sub_unit
+      FROM "CropSupplyUnit"
+      INNER JOIN "Estate"
+        ON "CropSupplyUnit".estate_id = "Estate".id
+      INNER JOIN "SubUnit"
+        ON "CropSupplyUnit".sub_unit_id = "SubUnit".id;
     `;
     res.json(rows);
   } catch (error) {
