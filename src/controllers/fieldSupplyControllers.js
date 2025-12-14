@@ -3,7 +3,8 @@ import { sql } from "../config/db.js";
 //get all receptions
 export const getAllFieldSupply = async (req, res) => {
   try {
-    const rows = await sql`SELECT * FROM "FieldSupply"`;
+    const rows =
+      await sql`SELECT * FROM "FieldSupply" WHERE productnature_id =1`;
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
