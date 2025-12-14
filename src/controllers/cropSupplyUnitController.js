@@ -4,15 +4,7 @@ import { sql } from "../config/db.js";
 export const getAllCropSupplyUnit = async (req, res) => {
   try {
     const rows = await sql`
-      SELECT 
-        "CropSupplyUnit".id AS crop_supply_unit_id,
-        "SubUnit".sub_unit AS sub_unit,
-        "Estate".name AS estate      
-      FROM "CropSupplyUnit"
-      INNER JOIN "Estate"
-        ON "CropSupplyUnit".estate_id = "Estate".id
-      INNER JOIN "SubUnit"
-        ON "CropSupplyUnit".sub_unit_id = "SubUnit".id;
+      SELECT * FROM "CropSupplyUnit";
     `;
     res.json(rows);
   } catch (error) {
@@ -23,13 +15,7 @@ export const getAllCropSupplyUnit = async (req, res) => {
 export const getCropSupplyUnitById = async (req, res) => {
   const { id } = req.params;
   try {
-    const [row] = await sql`SELECT 
-        "CropSupplyUnit".id AS crop_supply_unit_id,
-        "Estate".name AS estate
-      FROM "CropSupplyUnit"
-      INNER JOIN "Estate"
-        ON "CropSupplyUnit".estate_id = "Estate".id 
-      WHERE id = ${id}`;
+    const [row] = await sql`SELECT * FROM "CropSupplyUnit" WHERE id = ${id}`;
     if (!row) return res.status(404).json({ error: "Not found" });
     res.json(row);
   } catch (error) {
