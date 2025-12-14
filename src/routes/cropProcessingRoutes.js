@@ -6,7 +6,7 @@ import {
   getProcessingById,
   updateProcessing,
 } from "../controllers/processingControllers.js";
-import { requireAuth } from "../middleware/auth.js";
+
 
 const router = express.Router();
 

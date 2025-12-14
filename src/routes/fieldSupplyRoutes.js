@@ -3,7 +3,6 @@ import {
   getAllFieldSupply,
   getFieldSupplyById,
 } from "../controllers/fieldSupplyControllers.js";
-//import { requireAuth } from "../middleware/auth.js";
 
 const router = express.Router();
 

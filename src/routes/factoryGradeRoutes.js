@@ -3,7 +3,7 @@ import {
   getAllProcessedGrades,
   getAllProcessedGradesById,
 } from "../controllers/factoryGradeControllers.js";
-//import { requireAuth } from "../middleware/auth.js";
+
 
 const router = express.Router();
 

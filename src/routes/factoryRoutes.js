@@ -3,7 +3,7 @@ import {
   getAllFactory,
   getFactoryById,
 } from "../controllers/factoryControllers.js";
-import { requireAuth } from "../middleware/auth.js";
+
 
 const router = express.Router();
 

@@ -6,23 +6,23 @@ import {
   getReceptionById,
   updateReception,
 } from "../controllers/receptionControllers.js";
-import { requireAuth } from "../middleware/auth.js";
+import { requireAuth } from "@clerk/express";
 
 const router = express.Router();
 
 // Get all crop receptions
-router.get("/", getAllReception);
+router.get("/", requireAuth, getAllReception);
 
 // Get a single crop reception by ID
-router.get("/:id", getReceptionById);
+router.get("/:id", requireAuth, getReceptionById);
 
 // Create a new crop reception
-router.post("/", createReception);
+router.post("/", requireAuth, createReception);
 
 // Update a crop reception
-router.put("/:id", updateReception);
+router.put("/:id", requireAuth, updateReception);
 
 // Delete a crop reception
-router.delete("/:id", deleteReception);
+router.delete("/:id", requireAuth, deleteReception);
 
 export default router;
