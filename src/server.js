@@ -10,6 +10,7 @@ import factoryRoutes from "./routes/factoryRoutes.js";
 import fieldSupplyRoutes from "./routes/fieldSupplyRoutes.js";
 import cropSupplyUnitRoutes from "./routes/cropSupplyUnitRoutes.js";
 import factoryGradeRoutes from "./routes/factoryGradeRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -18,7 +19,7 @@ app.use(cors());
 
 // Parse JSON
 app.use(express.json());
-app.use(clerkMiddleware())
+app.use(clerkMiddleware());
 
 // Health check
 app.get("/api/health", (req, res) => {
@@ -32,6 +33,7 @@ app.use("/api/factory-grades", factoryGradeRoutes);
 app.use("/api/crop-supply-units", cropSupplyUnitRoutes);
 app.use("/api/crop-receptions", cropReceptionRoutes);
 app.use("/api/crop-processings", cropProcessingRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // Catch‑all 404 handler
 app.use((req, res) => {
