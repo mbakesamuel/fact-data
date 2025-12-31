@@ -27,8 +27,8 @@ app.get("/api/health", (req, res) => {
 });
 
 // Routes
-app.use("/api/factory", factoryRoutes);
-app.use("/api/field-supplies", fieldSupplyRoutes);
+app.use("/api/factories", factoryRoutes);
+app.use("/api/field-grades", fieldSupplyRoutes);
 app.use("/api/factory-grades", factoryGradeRoutes);
 app.use("/api/crop-supply-units", cropSupplyUnitRoutes);
 app.use("/api/crop-receptions", cropReceptionRoutes);
