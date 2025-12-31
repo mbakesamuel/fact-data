@@ -11,7 +11,7 @@ export const getAllProcessing = async (req, res) => {
           factoryId
         )};`;
     } else {
-      await sql`SELECT * FROM "CropProcessing";`;
+      rows = await sql`SELECT * FROM "CropProcessing";`;
     }
     res.json(rows);
   } catch (error) {
