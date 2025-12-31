@@ -21,6 +21,19 @@ export const getReceptionById = async (req, res) => {
   }
 };
 
+//get crop reception by Factory
+export const getReceptionByFactory = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [row] =
+      await sql`SELECT * FROM "CropReception" WHERE factory_id = ${id}`;
+    if (!row) return res.status(404).json({ error: "Not found" });
+    res.json(row);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export const createReception = async (req, res) => {
   const {
     operation_date,

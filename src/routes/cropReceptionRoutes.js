@@ -3,6 +3,7 @@ import {
   createReception,
   deleteReception,
   getAllReception,
+  getReceptionByFactory,
   getReceptionById,
   updateReception,
 } from "../controllers/receptionControllers.js";
@@ -15,6 +16,9 @@ router.get("/", getAllReception);
 
 // Get a single crop reception by ID
 router.get("/:id", getReceptionById);
+
+// Get a single crop reception by ID
+router.get("/factory/:id", getReceptionByFactory);
 
 // Create a new crop reception
 router.post("/", createReception);
