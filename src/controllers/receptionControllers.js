@@ -25,10 +25,10 @@ export const getReceptionById = async (req, res) => {
 export const getReceptionByFactory = async (req, res) => {
   const { id } = req.params;
   try {
-    const [row] =
+    const rows =
       await sql`SELECT * FROM "CropReception" WHERE factory_id = ${id}`;
-    if (!row) return res.status(404).json({ error: "Not found" });
-    res.json(row);
+    if (rows.length === 0) return res.status(404).json({ error: "Not found" });
+    res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
