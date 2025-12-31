@@ -7,7 +7,6 @@ import {
   updateProcessing,
 } from "../controllers/processingControllers.js";
 
-
 const router = express.Router();
 
 // Get all crop processings

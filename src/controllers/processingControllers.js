@@ -1,9 +1,18 @@
 import { sql } from "../config/db.js";
 
-// Get all crop processings
+// Get all crop processings:exceptionally filter by factory
 export const getAllProcessing = async (req, res) => {
   try {
-    const rows = await sql`SELECT * FROM "CropProcessing"`;
+    const { factoryId } = req.query;
+    let rows;
+    if (factoryId) {
+      rows =
+        await sql`SELECT * FROM "CropProcessing" WHERE factory_id = ${Number(
+          factoryId
+        )};`;
+    } else {
+      await sql`SELECT * FROM "CropProcessing";`;
+    }
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });

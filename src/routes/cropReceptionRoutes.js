@@ -2,8 +2,7 @@ import express from "express";
 import {
   createReception,
   deleteReception,
-  getAllReception,
-  getReceptionByFactory,
+  getAllReceptions,
   getReceptionById,
   updateReception,
 } from "../controllers/receptionControllers.js";
@@ -12,14 +11,10 @@ import {
 const router = express.Router();
 
 // Get all crop receptions
-router.get("/", getAllReception);
+router.get("/", getAllReceptions);
 
 // Get a single crop reception by ID
 router.get("/:id", getReceptionById);
-
-// Get a single crop reception by ID
-router.get("/factory/:id", getReceptionByFactory);
-
 // Create a new crop reception
 router.post("/", createReception);
 

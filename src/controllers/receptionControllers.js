@@ -1,9 +1,17 @@
 import { sql } from "../config/db.js";
 
-//get all receptions
-export const getAllReception = async (req, res) => {
+//get crop reception by Factory
+export const getAllReceptions = async (req, res) => {
   try {
-    const rows = await sql`SELECT * FROM "CropReception"`;
+    const { factoryId } = req.query;
+    let rows;
+
+    if (factoryId) {
+      rows =
+        await sql`SELECT * FROM "CropReception" WHERE factory_id = ${factoryId}`;
+    } else {
+      rows = await sql`SELECT * FROM "CropReception"`;
+    }
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -16,19 +24,6 @@ export const getReceptionById = async (req, res) => {
     const [row] = await sql`SELECT * FROM "CropReception" WHERE id = ${id}`;
     if (!row) return res.status(404).json({ error: "Not found" });
     res.json(row);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-//get crop reception by Factory
-export const getReceptionByFactory = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const rows =
-      await sql`SELECT * FROM "CropReception" WHERE factory_id = ${id}`;
-    if (rows.length === 0) return res.status(404).json({ error: "Not found" });
-    res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
