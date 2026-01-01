@@ -11,6 +11,8 @@ import fieldSupplyRoutes from "./routes/fieldSupplyRoutes.js";
 import cropSupplyUnitRoutes from "./routes/cropSupplyUnitRoutes.js";
 import factoryGradeRoutes from "./routes/factoryGradeRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import cropCollectionRoutes from "./routes/cropCollectionRoutes.js";
+import factoryFlowRoutes from "./routes/factoryFlowRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -34,6 +36,8 @@ app.use("/api/crop-supply-units", cropSupplyUnitRoutes);
 app.use("/api/crop-receptions", cropReceptionRoutes);
 app.use("/api/crop-processings", cropProcessingRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/crop-collections", cropCollectionRoutes);
+app.use("/api/factory-flows", factoryFlowRoutes);
 
 // Catch‑all 404 handler
 app.use((req, res) => {

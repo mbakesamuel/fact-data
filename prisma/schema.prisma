@@ -46,11 +46,15 @@ model Factory {
 
   cropProcessing CropProcessing[]
   cropReception  CropReception[]
+
+  factoryFlows Factory_flow[]
 }
 
 model CropType {
   id        Int    @id @default(autoincrement())
   crop_type String
+
+  factoryFlows Factory_flow[]
 }
 
 //this is like the various estates supplying the factories.
@@ -62,6 +66,8 @@ model CropSupplyUnit {
   subUnit       SubUnit         @relation(fields: [sub_unit_id], references: [id]) //one to many relation with subUnit.
   estate        Estate          @relation(fields: [estate_id], references: [id])
   cropReception CropReception[]
+
+  cropCollections Crop_collection[]
 }
 
 model Estate {
@@ -103,4 +109,37 @@ model ProductNature {
   product String
 
   fieldSupplies FieldSupply[]
+}
+
+model Crop_collection {
+  id                  Int             @id @default(autoincrement()) @map("ID")
+  budYear             Int             @map("BudYear")
+  cropSupplyUnitId    Int             @map("tbl_CropSupplyUnitId")
+  nonFunctional       Boolean         @map("NonFunc")
+  annualProduction    Decimal         @db.Decimal(18, 2) @map("AnnProd")
+  latexFlag           Boolean         @map("Latex?")
+  latexQty            Decimal?        @db.Decimal(18, 2) @map("Latex")
+  otherGradeQty       Decimal?        @db.Decimal(18, 2) @map("OtherGrade")
+
+  // Relations
+  cropSupplyUnit      CropSupplyUnit  @relation(fields: [cropSupplyUnitId], references: [id])
+  factoryFlows        Factory_flow[]
+
+  @@map("crop_collection")
+}
+
+model Factory_flow {
+  id               Int            @id @default(autoincrement()) @map("ID")
+  budYear          Int            @map("BudYear")
+  cropCollectionId Int            @map("tbl_CropCollectionId")
+  factoryId        Int            @map("tbl_FactoryId")
+  cropTypeId       Int            @map("tbl_CropTypeId")
+  processedQty     Decimal        @db.Decimal(18, 2) @map("ProQty")
+
+  // Relations
+  cropCollection   Crop_collection @relation(fields: [cropCollectionId], references: [id])
+  factory          Factory         @relation(fields: [factoryId], references: [id])
+  cropType         CropType        @relation(fields: [cropTypeId], references: [id])
+
+  @@map("Factory_flow")
 }
