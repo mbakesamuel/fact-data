@@ -7,20 +7,20 @@ export async function factoryFlowPhasing(baseYear) {
   try {
     // 1. Clear previous data
     await sql`
-      DELETE FROM "tbl_AnnProcEst_monthlyPhasing"
+      DELETE FROM "ProcEst_monthlyPhasing"
       WHERE EXTRACT(YEAR FROM "EffDate") = ${baseYear};
     `;
 
     // 2. Load ratios
     const ratios = await sql`
-      SELECT "MonthNo", "PhasingRatio", "AbPhasingRatio"
-      FROM "tbl_MonthlyPhasingRatio"
-      WHERE "BudYear" = ${baseYear};
+      SELECT "monthNo", "phasingRatio", "abPhasingRatio"
+      FROM "CropPhasingRatio"
+      WHERE "budYear" = ${baseYear};
     `;
 
     const monthlyPercents = {};
     const monthlyAbPercents = {};
-    ratios.forEach(r => {
+    ratios.forEach((r) => {
       monthlyPercents[r.MonthNo] = r.PhasingRatio || 0;
       monthlyAbPercents[r.MonthNo] = r.AbPhasingRatio || 0;
     });
@@ -30,7 +30,7 @@ export async function factoryFlowPhasing(baseYear) {
       SELECT ff."ID", ff."BudYear", ff."tbl_CropCollectionId",
              ff."tbl_FactoryId", ff."tbl_CropTypeId", ff."ProQty",
              cc."NonFunc"
-      FROM "tbl_CropCollection" cc
+      FROM "crop_collection" cc
       INNER JOIN "tbl_FactoryFlow" ff
       ON cc."ID" = ff."tbl_CropCollectionId";
     `;
@@ -48,7 +48,7 @@ export async function factoryFlowPhasing(baseYear) {
         const monthEst = Math.round(proQty * ratio * 100) / 100;
 
         await sql`
-          INSERT INTO "tbl_AnnProcEst_monthlyPhasing"
+          INSERT INTO "ProcEst_monthlyPhasing"
             ("tbl_FactoryID", "tbl_CropTypeID", "tbl_CropCollectionId", "EffDate", "MonthEst")
           VALUES (${flow.tbl_FactoryId}, ${flow.tbl_CropTypeId}, ${flow.tbl_CropCollectionId}, ${effDate}, ${monthEst});
         `;
