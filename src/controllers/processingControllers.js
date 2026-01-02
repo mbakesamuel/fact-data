@@ -1,7 +1,7 @@
 import { sql } from "../config/db.js";
 
 // Get all crop processings:exceptionally filter by factory
-export const getAllProcessing = async (req, res) => {
+/* export const getAllProcessing = async (req, res) => {
   try {
     const { factoryId } = req.query;
     let rows;
@@ -13,6 +13,44 @@ export const getAllProcessing = async (req, res) => {
     } else {
       rows = await sql`SELECT * FROM "CropProcessing";`;
     }
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}; */
+
+export const getAllProcessing = async (req, res) => {
+  try {
+    const { factoryId } = req.query;
+    let rows;
+
+    if (factoryId) {
+      rows = await sql`
+        SELECT 
+          cp.*,
+          f.id   AS factory_id,
+          f.factory_name AS factory_name,
+          fs.id  AS process_grade_id,
+          fs.crop AS process_grade_name
+        FROM "CropProcessing" cp
+        JOIN "Factory" f ON cp.factory_id = f.id
+        JOIN "FieldSupply" fs ON cp.process_grade_id = fs.id
+        WHERE cp.factory_id = ${Number(factoryId)};
+      `;
+    } else {
+      rows = await sql`
+        SELECT 
+          cp.*,
+          f.id   AS factory_id,
+          f.factory_name AS factory_name,
+          fs.id  AS process_grade_id,
+          fs.crop AS process_grade_name
+        FROM "CropProcessing" cp
+        JOIN "Factory" f ON cp.factory_id = f.id
+        JOIN "FieldSupply" fs ON cp.process_grade_id = fs.id;
+      `;
+    }
+
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });

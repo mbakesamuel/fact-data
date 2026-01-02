@@ -1,23 +1,5 @@
 import { sql } from "../config/db.js";
 
-//get crop reception by Factory
-/* export const getAllReceptions = async (req, res) => {
-  try {
-    const { factoryId } = req.query;
-    let rows;
-
-    if (factoryId) {
-      rows =
-        await sql`SELECT * FROM "CropReception" WHERE factory_id = ${factoryId}`;
-    } else {
-      rows = await sql`SELECT * FROM "CropReception"`;
-    }
-    res.json(rows);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
- */
 export const getAllReceptions = async (req, res) => {
   try {
     const { factoryId } = req.query;
