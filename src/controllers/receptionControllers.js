@@ -1,7 +1,7 @@
 import { sql } from "../config/db.js";
 
 //get crop reception by Factory
-export const getAllReceptions = async (req, res) => {
+/* export const getAllReceptions = async (req, res) => {
   try {
     const { factoryId } = req.query;
     let rows;
@@ -12,6 +12,44 @@ export const getAllReceptions = async (req, res) => {
     } else {
       rows = await sql`SELECT * FROM "CropReception"`;
     }
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+ */
+export const getAllReceptions = async (req, res) => {
+  try {
+    const { factoryId } = req.query;
+    let rows;
+
+    if (factoryId) {
+      rows = await sql`
+        SELECT 
+          cr.*,
+          f.id AS factory_id,
+          f.factory_name AS factory_name,
+          fs.id AS field_grade_id,
+          fs.crop AS field_grade_name
+        FROM "CropReception" cr
+        JOIN "Factory" f ON cr.factory_id = f.id
+        JOIN "FieldSupply" fs ON cr.field_grade_id = fs.id
+        WHERE cr.factory_id = ${factoryId};
+      `;
+    } else {
+      rows = await sql`
+        SELECT 
+          cr.*,
+          f.id AS factory_id,
+          f.factory_name AS factory_name,
+          fs.id AS field_grade_id,
+          fs.crop AS field_grade_name
+        FROM "CropReception" cr
+        JOIN "Factory" f ON cr.factory_id = f.id
+        JOIN "FieldSupply" fs ON cr.field_grade_id = fs.id;
+      `;
+    }
+
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
