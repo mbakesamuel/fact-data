@@ -48,6 +48,8 @@ model Factory {
   cropReception  CropReception[]
 
   factoryFlows Factory_flow[]
+
+  procEstMonthlyPhasings ProcEstMonthlyPhasing[]
 }
 
 model CropType {
@@ -55,6 +57,8 @@ model CropType {
   crop_type String
 
   factoryFlows Factory_flow[]
+
+  procEstMonthlyPhasings ProcEstMonthlyPhasing[]
 }
 
 //this is like the various estates supplying the factories.
@@ -126,6 +130,7 @@ model Crop_collection {
   factoryFlows        Factory_flow[]
 
   @@map("crop_collection")
+  procEstMonthlyPhasings ProcEstMonthlyPhasing[]
 }
 
 model Factory_flow {
@@ -143,3 +148,27 @@ model Factory_flow {
 
   @@map("Factory_flow")
 }
+
+model CropPhasingRatio {
+  id             Int     @id @default(autoincrement())
+  budYear        Int
+  monthNo        Int
+  monthName      String
+  phasingRatio   Float
+  abPhasingRatio Float
+}
+
+model ProcEstMonthlyPhasing {
+  id                 Int      @id @default(autoincrement())
+  tbl_FactoryID      Int
+  tbl_CropTypeID     Int
+  tbl_CropCollectionId Int
+  effDate            DateTime
+  monthEst           Float
+
+  //define relations
+  factory        Factory     @relation(fields: [tbl_FactoryID], references: [id])
+  cropType       CropType    @relation(fields: [tbl_CropTypeID], references: [id])
+  cropCollection Crop_collection @relation(fields: [tbl_CropCollectionId], references: [id])
+}
+
