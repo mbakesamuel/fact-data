@@ -1,5 +1,5 @@
 import express from "express";
-import { factoryFlowPhasing } from "../controllers/flowPhasingControllers.js";
+import {flowPhasing} from '../services/flowPhasing.js';
 
 const router = express.Router();
 
@@ -8,12 +8,12 @@ router.post("/factory-flow-phasing", async (req, res) => {
   const { baseYear } = req.body;
 
   try {
-    await factoryFlowPhasing(Number(baseYear));
+    await flowPhasing(Number(baseYear));
     res
       .status(200)
       .json({ message: "Factory flow phasing generated successfully." });
   } catch (err) {
-    console.error("Error in factoryFlowPhasing:", err);
+    console.error("Error in factory flow phasing:", err);
     res.status(500).json({ error: err.message });
   }
 });

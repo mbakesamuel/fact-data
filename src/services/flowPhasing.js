@@ -1,9 +1,7 @@
-import { sql } from "../config/db.js";
-
 // factoryFlowPhasing.js
 import { sql } from "../config/db.js";
 
-export async function factoryFlowPhasing(baseYear) {
+export async function flowPhasing(baseYear) {
   try {
     // 1. Clear previous data
     await sql`
