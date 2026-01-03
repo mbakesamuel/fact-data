@@ -50,6 +50,8 @@ model Factory {
   factoryFlows FactoryFlow[]
 
   procEstMonthlyPhasings ProcEstMonthlyPhasing[]
+
+  factWeeklyPhasings FactWeeklyPhasing[]
 }
 
 model CropType {
@@ -59,6 +61,8 @@ model CropType {
   factoryFlows FactoryFlow[]
 
   procEstMonthlyPhasings ProcEstMonthlyPhasing[]
+
+  factWeeklyPhasings FactWeeklyPhasing[]
 }
 
 //this is like the various estates supplying the factories.
@@ -168,4 +172,22 @@ model ProcEstMonthlyPhasing {
   cropType       CropType    @relation(fields: [tbl_CropTypeID], references: [id])
   cropCollection CropCollection @relation(fields: [tbl_CropCollectionId], references: [id])
 }
+
+model FactWeeklyPhasing {
+  id             Int      @id @default(autoincrement())
+  BudYear        Int
+  Period         String
+  WeekStart      DateTime
+  WeekEnd        DateTime
+  DaysAllocated  Int
+  tbl_FactoryId  Int
+  tbl_CropTypeId Int
+  weekNo         Int
+  WkEst          Float
+  //define relations
+  Factory   Factory   @relation(fields: [tbl_FactoryId], references: [id])
+  CropType  CropType  @relation(fields: [tbl_CropTypeId], references: [id])
+
+}
+
 

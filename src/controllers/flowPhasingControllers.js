@@ -26,6 +26,7 @@ export async function getFlowPhasing(req, res) {
         pmp."monthEst",
         f.id AS factoryId,
         f."factory_name",
+        ct.id As cropTypeId,
         ct."crop_type",
         cc."budYear",
         cc."id" AS cropCollectionId
