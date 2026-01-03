@@ -3,7 +3,21 @@ import { sql } from "../config/db.js";
 //get crop reception by Factory
 export const getAllCropCollection = async (req, res) => {
   try {
-    const rows = await sql`SELECT * FROM "crop_collection" `;
+    const rows = await sql`
+      SELECT 
+        cc.*,
+        csu.*,
+        e."name" AS estate_name,
+        su."sub_unit" AS sub_unit,
+        (e."name" || ' - ' || su."sub_unit") AS estate_subunit
+      FROM "CropCollection" cc
+      INNER JOIN "CropSupplyUnit" csu
+        ON cc."cropSupplyUnitId" = csu."id"
+      INNER JOIN "Estate" e
+        ON csu."estate_id" = e."id"
+      INNER JOIN "SubUnit" su
+        ON csu."sub_unit_id" = su."id"
+    `;
 
     res.json(rows);
   } catch (error) {
@@ -14,7 +28,20 @@ export const getAllCropCollection = async (req, res) => {
 export const getAllCropCollectionById = async (req, res) => {
   const { id } = req.params;
   try {
-    const [row] = await sql`SELECT * FROM "crop_collection" WHERE id = ${id}`;
+    const [row] = await sql`  SELECT 
+        cc.*,
+        csu.*,
+        e."name" AS estate_name,
+        su."sub_unit" AS sub_unit,
+        (e."name" || ' - ' || su."sub_unit") AS estate_subunit
+      FROM "CropCollection" cc
+      INNER JOIN "CropSupplyUnit" csu
+        ON cc."cropSupplyUnitId" = csu."id"
+      INNER JOIN "Estate" e
+        ON csu."estate_id" = e."id"
+      INNER JOIN "SubUnit" su
+        ON csu."sub_unit_id" = su."id"
+    WHERE cc."id" = ${id}`;
     if (!row) return res.status(404).json({ error: "Not found" });
     res.json(row);
   } catch (error) {
