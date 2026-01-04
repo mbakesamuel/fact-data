@@ -1,7 +1,7 @@
 import express from "express";
 import {
   CreateWeeklyPhasing,
-  getDailyEstimate,
+  getPhasingEstimates,
 } from "../controllers/PhasingControllers.js";
 
 const router = express.Router();
@@ -10,7 +10,7 @@ const router = express.Router();
 router.post("/", CreateWeeklyPhasing);
 
 // GET /api/crop-phasing
-router.get("/daily", getDailyEstimate);
+router.get("/", getPhasingEstimates);
 
 //add other routes if needed
 

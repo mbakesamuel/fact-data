@@ -14,7 +14,7 @@ import dashboardRoutes from "./routes/dashboardRoutes.js";
 import cropCollectionRoutes from "./routes/cropCollectionRoutes.js";
 import factoryFlowRoutes from "./routes/factoryFlowRoutes.js";
 import flowphasingRoutes from "./routes/flowPhasingRoutes.js";
-import weeklyPhasingRoutes from "./routes/weeklyPhasingRoutes.js";
+import PhasingRoutes from "./routes/PhasingRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -41,7 +41,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/crop-collections", cropCollectionRoutes);
 app.use("/api/factory-flows", factoryFlowRoutes);
 app.use("/api/factory-flow-phasing", flowphasingRoutes);
-app.use("/api/crop-phasing", weeklyPhasingRoutes);
+app.use("/api/crop-phasing", PhasingRoutes);
 
 // Catch‑all 404 handler
 app.use((req, res) => {
