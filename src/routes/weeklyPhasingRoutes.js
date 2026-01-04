@@ -1,16 +1,16 @@
 import express from "express";
 import {
   CreateWeeklyPhasing,
-  getWeeklyPhasing,
-} from "../controllers/weeklyPhasingControllers.js";
+  getDailyEstimate,
+} from "../controllers/PhasingControllers.js";
 
 const router = express.Router();
 
 //POST
 router.post("/", CreateWeeklyPhasing);
 
-// GET /api/weekly-phasing
-router.get("/", getWeeklyPhasing);
+// GET /api/crop-phasing
+router.get("/daily", getDailyEstimate);
 
 //add other routes if needed
 

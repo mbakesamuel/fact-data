@@ -41,7 +41,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/crop-collections", cropCollectionRoutes);
 app.use("/api/factory-flows", factoryFlowRoutes);
 app.use("/api/factory-flow-phasing", flowphasingRoutes);
-app.use("/api/weekly-phasing", weeklyPhasingRoutes);
+app.use("/api/crop-phasing", weeklyPhasingRoutes);
 
 // Catch‑all 404 handler
 app.use((req, res) => {
