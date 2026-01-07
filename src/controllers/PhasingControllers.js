@@ -11,6 +11,185 @@ export async function CreateWeeklyPhasing(req, res) {
     res.status(500).json({ error: "Internal Server Error" });
   }
 }
+/* 
+export async function getPhasingEstimates(req, res) {
+  try {
+    const { year, factoryId, date } = req.query; // e.g. '2026-01-03'
+
+    // --- Daily estimate ---
+    const dailyRows = await sql`
+      SELECT 
+        fwp."tbl_CropTypeId",
+        ct."crop_type",
+        (fwp."WkEst" / NULLIF(fwp."DaysAllocated",0)) AS "DailyEst",
+        fac."factory_name"
+      FROM "FactWeeklyPhasing" fwp
+      INNER JOIN "Factory" fac ON fwp."tbl_FactoryId" = fac."id"
+      INNER JOIN "CropType" ct ON fwp."tbl_CropTypeId" = ct."id"
+      WHERE fwp."BudYear" = ${year}
+        AND fwp."tbl_FactoryId" = ${factoryId}
+        AND ${date}::date BETWEEN fwp."WeekStart"::date AND fwp."WeekEnd"::date;
+    `;
+
+    const dailyReception = await sql`
+      SELECT 
+        r."field_grade_id" AS "cropTypeId",
+        SUM(r."qty_crop") AS "actualReception"
+      FROM "CropReception" r
+      WHERE r."factory_id" = ${factoryId}
+        AND r."operation_date"::date = ${date}::date
+      GROUP BY r."field_grade_id";
+    `;
+
+    // --- Weekly estimate (week-to-date cumulative) ---
+    const weeklyRows = await sql`
+      SELECT 
+        fwp."tbl_CropTypeId",
+        ct."crop_type",
+        SUM(fwp."WkEst" / NULLIF(fwp."DaysAllocated",0)) AS "WkToDateEst"
+      FROM "FactWeeklyPhasing" fwp
+      INNER JOIN "CropType" ct ON fwp."tbl_CropTypeId" = ct."id"
+      WHERE fwp."BudYear" = ${year}
+        AND fwp."tbl_FactoryId" = ${factoryId}
+        AND ${date}::date BETWEEN fwp."WeekStart"::date AND fwp."WeekEnd"::date
+      GROUP BY fwp."tbl_CropTypeId", ct."crop_type";
+    `;
+
+    const weeklyReception = await sql`
+      SELECT 
+        r."field_grade_id" AS "cropTypeId",
+        SUM(r."qty_crop") AS "actualReception"
+      FROM "CropReception" r
+      WHERE r."factory_id" = ${factoryId}
+        AND r."operation_date"::date BETWEEN DATE_TRUNC('week', ${date}::date) 
+                                         AND ${date}::date
+      GROUP BY r."field_grade_id";
+    `;
+
+    // --- Monthly estimate (month-to-date cumulative) ---
+    const monthlyRows = await sql`
+      SELECT 
+        fwp."tbl_CropTypeId",
+        ct."crop_type",
+        SUM(fwp."WkEst" / NULLIF(fwp."DaysAllocated",0)) AS "MonthToDateEst"
+      FROM "FactWeeklyPhasing" fwp
+      INNER JOIN "CropType" ct ON fwp."tbl_CropTypeId" = ct."id"
+      WHERE fwp."BudYear" = ${year}
+        AND fwp."tbl_FactoryId" = ${factoryId}
+        AND fwp."WeekStart"::date >= DATE_TRUNC('month', ${date}::date)
+        AND fwp."WeekEnd"::date <= ${date}::date
+      GROUP BY fwp."tbl_CropTypeId", ct."crop_type";
+    `;
+
+    const monthlyReception = await sql`
+      SELECT 
+        r."field_grade_id" AS "cropTypeId",
+        SUM(r."qty_crop") AS "actualReception"
+      FROM "CropReception" r
+      WHERE r."factory_id" = ${factoryId}
+        AND r."operation_date"::date BETWEEN DATE_TRUNC('month', ${date}::date)
+                                         AND ${date}::date
+      GROUP BY r."field_grade_id";
+    `;
+
+    // --- Yearly estimate (year-to-date cumulative) ---
+    const yearlyRows = await sql`
+      SELECT 
+        fwp."tbl_CropTypeId",
+        ct."crop_type",
+        SUM(fwp."WkEst" / NULLIF(fwp."DaysAllocated",0)) AS "YearToDateEst"
+      FROM "FactWeeklyPhasing" fwp
+      INNER JOIN "CropType" ct ON fwp."tbl_CropTypeId" = ct."id"
+      WHERE fwp."BudYear" = ${year}
+        AND fwp."tbl_FactoryId" = ${factoryId}
+        AND fwp."WeekStart"::date >= DATE_TRUNC('year', ${date}::date)
+        AND fwp."WeekEnd"::date <= ${date}::date
+      GROUP BY fwp."tbl_CropTypeId", ct."crop_type";
+    `;
+
+    const yearlyReception = await sql`
+      SELECT 
+        r."field_grade_id" AS "cropTypeId",
+        SUM(r."qty_crop") AS "actualReception"
+      FROM "CropReception" r
+      WHERE r."factory_id" = ${factoryId}
+        AND r."operation_date"::date BETWEEN DATE_TRUNC('year', ${date}::date)
+                                         AND ${date}::date
+      GROUP BY r."field_grade_id";
+    `;
+
+    // --- Build response ---
+    const daily = dailyRows.map((r) => {
+      const actual =
+        dailyReception.find((x) => x.cropTypeId === r.tbl_CropTypeId)
+          ?.actualReception ?? 0;
+      return {
+        cropTypeId: r.tbl_CropTypeId,
+        crop_type: r.crop_type,
+        dailyEstimate: r.DailyEst,
+        actualReception: actual,
+        variance: actual - r.DailyEst,
+      };
+    });
+
+    const weekly = weeklyRows.map((r) => {
+      const actual =
+        weeklyReception.find((x) => x.cropTypeId === r.tbl_CropTypeId)
+          ?.actualReception ?? 0;
+      return {
+        cropTypeId: r.tbl_CropTypeId,
+        crop_type: r.crop_type,
+        weeklyEstimate: r.WkToDateEst,
+        actualReception: actual,
+        variance: actual - r.WkToDateEst,
+      };
+    });
+
+    const monthly = {};
+    const monthKey = new Date(date).toLocaleString("default", {
+      month: "long",
+    });
+    monthly[monthKey] = {};
+    monthlyRows.forEach((r) => {
+      const actual =
+        monthlyReception.find((x) => x.cropTypeId === r.tbl_CropTypeId)
+          ?.actualReception ?? 0;
+      monthly[monthKey][r.crop_type] = {
+        estimate: Number(r.MonthToDateEst),
+        actual,
+        variance: actual - Number(r.MonthToDateEst),
+      };
+    });
+
+    const yearly = {};
+    yearlyRows.forEach((r) => {
+      const actual =
+        yearlyReception.find((x) => x.cropTypeId === r.tbl_CropTypeId)
+          ?.actualReception ?? 0;
+      yearly[r.crop_type] = {
+        estimate: Number(r.YearToDateEst),
+        actual,
+        variance: actual - Number(r.YearToDateEst),
+      };
+    });
+
+    res.json({
+      date,
+      factoryId,
+      factory_name: dailyRows[0]?.factory_name,
+      estimates: {
+        daily,
+        weekly,
+        monthly,
+        yearly,
+      },
+    });
+  } catch (err) {
+    console.error("Error fetching phasing estimates:", err);
+    res.status(500).json({ error: err.message });
+  }
+}
+ */
 
 export async function getPhasingEstimates(req, res) {
   try {
@@ -41,21 +220,24 @@ export async function getPhasingEstimates(req, res) {
       GROUP BY r."field_grade_id";
     `;
 
-    // --- Weekly estimate ---
+    // --- Weekly estimate (week-to-date cumulative) ---
     const weeklyRows = await sql`
       SELECT 
         fwp."tbl_CropTypeId",
         ct."crop_type",
-        fwp."WkEst",
-        fwp."WeekStart",
-        fwp."WeekEnd",
-        fwp."weekNo",
-        fwp."Period"
+        SUM(
+          (fwp."WkEst" / NULLIF(fwp."DaysAllocated",0)) *
+          ((LEAST(${date}::date, fwp."WeekEnd"::date) 
+            - GREATEST(DATE_TRUNC('week', ${date}::date)::date, fwp."WeekStart"::date)
+          )::int + 1)
+        ) AS "WkToDateEst"
       FROM "FactWeeklyPhasing" fwp
       INNER JOIN "CropType" ct ON fwp."tbl_CropTypeId" = ct."id"
       WHERE fwp."BudYear" = ${year}
         AND fwp."tbl_FactoryId" = ${factoryId}
-        AND ${date}::date BETWEEN fwp."WeekStart"::date AND fwp."WeekEnd"::date;
+        AND fwp."WeekEnd"::date >= DATE_TRUNC('week', ${date}::date)
+        AND fwp."WeekStart"::date <= ${date}::date
+      GROUP BY fwp."tbl_CropTypeId", ct."crop_type";
     `;
 
     const weeklyReception = await sql`
@@ -65,21 +247,28 @@ export async function getPhasingEstimates(req, res) {
       FROM "CropReception" r
       WHERE r."factory_id" = ${factoryId}
         AND r."operation_date"::date BETWEEN DATE_TRUNC('week', ${date}::date) 
-                                         AND DATE_TRUNC('week', ${date}::date) + interval '6 days'
+                                         AND ${date}::date
       GROUP BY r."field_grade_id";
     `;
 
-    // --- Monthly estimate (current month only) ---
+    // --- Monthly estimate (month-to-date cumulative) ---
     const monthlyRows = await sql`
       SELECT 
-        p."tbl_CropTypeID",
+        fwp."tbl_CropTypeId",
         ct."crop_type",
-        p."monthEst"
-      FROM "ProcEstMonthlyPhasing" p
-      INNER JOIN "CropType" ct ON p."tbl_CropTypeID" = ct."id"
-      WHERE EXTRACT(YEAR FROM p."effDate") = EXTRACT(YEAR FROM ${date}::date)
-        AND EXTRACT(MONTH FROM p."effDate") = EXTRACT(MONTH FROM ${date}::date)
-        AND p."tbl_FactoryID" = ${factoryId};
+        SUM(
+          (fwp."WkEst" / NULLIF(fwp."DaysAllocated",0)) *
+          ((LEAST(${date}::date, fwp."WeekEnd"::date) 
+            - GREATEST(DATE_TRUNC('month', ${date}::date)::date, fwp."WeekStart"::date)
+          )::int + 1)
+        ) AS "MonthToDateEst"
+      FROM "FactWeeklyPhasing" fwp
+      INNER JOIN "CropType" ct ON fwp."tbl_CropTypeId" = ct."id"
+      WHERE fwp."BudYear" = ${year}
+        AND fwp."tbl_FactoryId" = ${factoryId}
+        AND fwp."WeekEnd"::date >= DATE_TRUNC('month', ${date}::date)
+        AND fwp."WeekStart"::date <= ${date}::date
+      GROUP BY fwp."tbl_CropTypeId", ct."crop_type";
     `;
 
     const monthlyReception = await sql`
@@ -88,23 +277,29 @@ export async function getPhasingEstimates(req, res) {
         SUM(r."qty_crop") AS "actualReception"
       FROM "CropReception" r
       WHERE r."factory_id" = ${factoryId}
-        AND EXTRACT(YEAR FROM r."operation_date") = EXTRACT(YEAR FROM ${date}::date)
-        AND EXTRACT(MONTH FROM r."operation_date") = EXTRACT(MONTH FROM ${date}::date)
+        AND r."operation_date"::date BETWEEN DATE_TRUNC('month', ${date}::date)
+                                         AND ${date}::date
       GROUP BY r."field_grade_id";
     `;
 
-    // --- Yearly estimate (year-to-date until today) ---
+    // --- Yearly estimate (year-to-date cumulative) ---
     const yearlyRows = await sql`
       SELECT 
-        p."tbl_CropTypeID",
+        fwp."tbl_CropTypeId",
         ct."crop_type",
-        SUM(p."monthEst") AS "yearEst"
-      FROM "ProcEstMonthlyPhasing" p
-      INNER JOIN "CropType" ct ON p."tbl_CropTypeID" = ct."id"
-      WHERE EXTRACT(YEAR FROM p."effDate") = EXTRACT(YEAR FROM ${date}::date)
-        AND p."tbl_FactoryID" = ${factoryId}
-        AND p."effDate"::date <= ${date}::date
-      GROUP BY p."tbl_CropTypeID", ct."crop_type";
+        SUM(
+          (fwp."WkEst" / NULLIF(fwp."DaysAllocated",0)) *
+          ((LEAST(${date}::date, fwp."WeekEnd"::date) 
+            - GREATEST(DATE_TRUNC('year', ${date}::date)::date, fwp."WeekStart"::date)
+          )::int + 1)
+        ) AS "YearToDateEst"
+      FROM "FactWeeklyPhasing" fwp
+      INNER JOIN "CropType" ct ON fwp."tbl_CropTypeId" = ct."id"
+      WHERE fwp."BudYear" = ${year}
+        AND fwp."tbl_FactoryId" = ${factoryId}
+        AND fwp."WeekEnd"::date >= DATE_TRUNC('year', ${date}::date)
+        AND fwp."WeekStart"::date <= ${date}::date
+      GROUP BY fwp."tbl_CropTypeId", ct."crop_type";
     `;
 
     const yearlyReception = await sql`
@@ -113,8 +308,8 @@ export async function getPhasingEstimates(req, res) {
         SUM(r."qty_crop") AS "actualReception"
       FROM "CropReception" r
       WHERE r."factory_id" = ${factoryId}
-        AND EXTRACT(YEAR FROM r."operation_date") = EXTRACT(YEAR FROM ${date}::date)
-        AND r."operation_date"::date <= ${date}::date
+        AND r."operation_date"::date BETWEEN DATE_TRUNC('year', ${date}::date)
+                                         AND ${date}::date
       GROUP BY r."field_grade_id";
     `;
 
@@ -126,9 +321,9 @@ export async function getPhasingEstimates(req, res) {
       return {
         cropTypeId: r.tbl_CropTypeId,
         crop_type: r.crop_type,
-        dailyEstimate: r.DailyEst,
+        dailyEstimate: Number(r.DailyEst),
         actualReception: actual,
-        variance: actual - r.DailyEst,
+        variance: actual - Number(r.DailyEst),
       };
     });
 
@@ -139,11 +334,9 @@ export async function getPhasingEstimates(req, res) {
       return {
         cropTypeId: r.tbl_CropTypeId,
         crop_type: r.crop_type,
-        weeklyEstimate: r.WkEst,
+        weeklyEstimate: Number(r.WkToDateEst),
         actualReception: actual,
-        variance: actual - r.WkEst,
-        weekNo: r.weekNo,
-        period: r.Period,
+        variance: actual - Number(r.WkToDateEst),
       };
     });
 
@@ -154,31 +347,31 @@ export async function getPhasingEstimates(req, res) {
     monthly[monthKey] = {};
     monthlyRows.forEach((r) => {
       const actual =
-        monthlyReception.find((x) => x.cropTypeId === r.tbl_CropTypeID)
+        monthlyReception.find((x) => x.cropTypeId === r.tbl_CropTypeId)
           ?.actualReception ?? 0;
       monthly[monthKey][r.crop_type] = {
-        estimate: Number(r.monthEst),
+        estimate: Number(r.MonthToDateEst),
         actual,
-        variance: actual - Number(r.monthEst),
+        variance: actual - Number(r.MonthToDateEst),
       };
     });
 
     const yearly = {};
     yearlyRows.forEach((r) => {
       const actual =
-        yearlyReception.find((x) => x.cropTypeId === r.tbl_CropTypeID)
+        yearlyReception.find((x) => x.cropTypeId === r.tbl_CropTypeId)
           ?.actualReception ?? 0;
       yearly[r.crop_type] = {
-        estimate: Number(r.yearEst),
+        estimate: Number(r.YearToDateEst),
         actual,
-        variance: actual - Number(r.yearEst),
+        variance: actual - Number(r.YearToDateEst),
       };
     });
 
     res.json({
       date,
       factoryId,
-      factory_name: dailyRows[0]?.factory_name || weeklyRows[0]?.factory_name,
+      factory_name: dailyRows[0]?.factory_name,
       estimates: {
         daily,
         weekly,
